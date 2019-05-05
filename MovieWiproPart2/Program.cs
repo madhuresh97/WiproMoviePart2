@@ -77,9 +77,9 @@ namespace MovieWiproPart2
     class Screen
     {
         int screenID;
-        SortedList<int, string> seats = new SortedList<int, string>();
+        public SortedList<int, string> seats = new SortedList<int, string>();
 
-        public Screen(int screenID, SortedList<int, string> seats)
+        public Screen(int screenID)
         {
             if (screenID > 1000)
                 this.screenID = screenID;
@@ -101,11 +101,11 @@ namespace MovieWiproPart2
         int ScreenID;
         DateTime StartDate;
         DateTime EndDate;
-        decimal PlatinumSeatRate;
-        decimal GoldSeatRate;
-        decimal SilverSeatRate;
+        public decimal PlatinumSeatRate;
+        public decimal GoldSeatRate;
+        public decimal SilverSeatRate;
 
-        public Show(int ShowID, int MovieID, int TheatreID, int ScreenID, DateTime StartDate, DateTime EndDate, decimal PlatinumSeatRate, decimal GoldSeatRate, decimal SilverSeatRate)
+        public Show(int MovieID, int TheatreID, int ScreenID, DateTime StartDate, DateTime EndDate, decimal PlatinumSeatRate, decimal GoldSeatRate, decimal SilverSeatRate)
         {
             Random rnd = new Random();
             this.ShowID = rnd.Next(1000, 2000);
@@ -152,7 +152,7 @@ namespace MovieWiproPart2
 
     class Booking
     {
-        int BookingID;
+        int BookingID=1000;
         DateTime BookingDate = DateTime.Now;
         int ShowID;
         string CustomerName;
@@ -163,9 +163,8 @@ namespace MovieWiproPart2
         string BookingStatus;
         List<int> SeatNumbers = new List<int>();
 
-        public Booking(int BookingID, int ShowID, string CustomerName, int NumberOfSeats, string SeatType, decimal Amount, string Email, string BookingStatus, List<int> SeatNumbers)
+        public Booking(int ShowID, string CustomerName, int NumberOfSeats, string SeatType, string Email, Screen screen1, Show show1)
         {
-            this.BookingID = 1000;
             this.ShowID = ShowID;
             this.CustomerName = CustomerName;
             this.NumberOfSeats = NumberOfSeats;
@@ -175,27 +174,39 @@ namespace MovieWiproPart2
             }
 
             this.SeatType = SeatType;
-            if (SeatType == "Platinum")
+            int VacantSeat = 0;
+            foreach (string s in screen1.seats.Values)
             {
-                this.Amount = 300;
+                if (s == "Vacant")
+                    VacantSeat++;
             }
-            else if (SeatType == "Gold")
+
+            if (NumberOfSeats < VacantSeat)
             {
-                this.Amount = 200;
-            }
-            else if (SeatType == "Silver")
-            {
-                this.Amount = 100;
+                for (int i = 0; i < NumberOfSeats; i++)
+                {
+                    int key = screen1.seats.IndexOfValue("Vacant");
+                    screen1.seats[key] = "Reserved";
+                    SeatNumbers.Add(key);
+                }
+                BookingStatus = "Success";
             }
             else
             {
                 Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
+                BookingStatus = "Fail";
             }
 
-            this.Amount = NumberOfSeats * Amount;
+            if (SeatType.ToLower() == "platinum")
+                this.Amount = NumberOfSeats * show1.PlatinumSeatRate;
+            else if (SeatType.ToLower() == "gold")
+                this.Amount = NumberOfSeats * show1.GoldSeatRate;
+            else if (SeatType.ToLower() == "silver")
+                this.Amount = NumberOfSeats * show1.SilverSeatRate;
+            else
+                Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
+
             this.Email = Email;
-            this.BookingStatus = BookingStatus;
-            this.SeatNumbers = SeatNumbers;
         }
     }
 
