@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WiproMoviePart2
+namespace MovieWiproPart2
 {
     class Movie
     {
