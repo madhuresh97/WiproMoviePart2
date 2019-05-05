@@ -9,10 +9,10 @@ namespace MovieWiproPart2
         string movieName, director, producer, cast, story, type;
         double duration;
 
-        public Movie(int movieID, string movieName, string director, string producer, string cast, double duration, string story, string type)
+        public Movie(string movieName, string director, string producer, string cast, double duration, string story, string type)
         {
             Random rnd = new Random();
-            this.movieID = rnd.Next(1000, 2000);
+            movieID = rnd.Next(1000, 2000);
             this.movieName = movieName;
             this.director = director;
             this.producer = producer;
@@ -20,11 +20,12 @@ namespace MovieWiproPart2
             this.duration = duration;
             this.story = story;
             this.type = type;
-            if (type != "Running" || type != "Upcoming")
+            if (type.Equals("Running") || type.Equals("Upcoming"))
             {
-                Console.WriteLine("Enter type as Running or Upcoming.");
+                Console.WriteLine("");
             }
-
+            else
+                Console.WriteLine("Enter type as Running or Upcoming.");
         }
 
         public void DisplayMovieDetails()
@@ -49,7 +50,7 @@ namespace MovieWiproPart2
         int numberOfScreen;
         List<int> screens = new List<int>();
 
-        public Theatre(int theatreID, string theatreName, string city, string address, int numberOfScreen, List<int> screens)
+        public Theatre(string theatreName, string city, string address, int numberOfScreen)
         {
             Random rnd = new Random();
             this.theatreID = rnd.Next(1000, 2000);
@@ -108,7 +109,7 @@ namespace MovieWiproPart2
         public Show(int MovieID, int TheatreID, int ScreenID, DateTime StartDate, DateTime EndDate, decimal PlatinumSeatRate, decimal GoldSeatRate, decimal SilverSeatRate)
         {
             Random rnd = new Random();
-            this.ShowID = rnd.Next(1000, 2000);
+            ShowID = rnd.Next(1000, 2000);
             this.MovieID = MovieID;
             this.TheatreID = TheatreID;
             this.ScreenID = ScreenID;
@@ -198,11 +199,11 @@ namespace MovieWiproPart2
             }
 
             if (SeatType.ToLower() == "platinum")
-                this.Amount = NumberOfSeats * show1.PlatinumSeatRate;
+                Amount = NumberOfSeats * show1.PlatinumSeatRate;
             else if (SeatType.ToLower() == "gold")
-                this.Amount = NumberOfSeats * show1.GoldSeatRate;
+                Amount = NumberOfSeats * show1.GoldSeatRate;
             else if (SeatType.ToLower() == "silver")
-                this.Amount = NumberOfSeats * show1.SilverSeatRate;
+                Amount = NumberOfSeats * show1.SilverSeatRate;
             else
                 Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
 
@@ -214,7 +215,11 @@ namespace MovieWiproPart2
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World");
+            Movie movie1 = new Movie("Avengers", "Russo Brothers", "Marvel", "Chris, RDJ", 180, "Fiction", "Running");
+            movie1.DisplayMovieDetails();
+
+            Theatre t1 = new Theatre("INOX", "Vadodara", "Race Course Road", 2);
+            t1.DisplayTheatreDetails();
         }
     }
 }
