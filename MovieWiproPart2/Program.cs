@@ -3,6 +3,20 @@ using System.Collections.Generic;
 
 namespace MovieWiproPart2
 {
+    interface IAdmin
+    {
+        bool AddTheatre(Theatre obj);
+        bool UpdateTheatre(Theatre obj);
+        bool AddMovie(Movie obj);
+        bool UpdateMovie(Movie obj);
+        bool AddShow(Show obj);
+        bool UpdateShow(Show obj);
+        bool DeleteShow(int ShowID);
+        bool AddAgent(User obj);
+        List<Theatre> GetAllTheatres();
+        List<Movie> GetAllMovies();
+        List<Show> GetAllShows();
+    }
     class Movie
     {
         public int movieID;
@@ -201,6 +215,55 @@ namespace MovieWiproPart2
         }
     }
 
+    class Administrator : IAdmin
+    {
+        public bool AddTheatre(Theatre t)
+        {
+            return true;
+        }
+        public bool UpdateTheatre(Theatre t)
+        {
+            return true;
+        }
+        public bool AddMovie(Movie m)
+        {
+            return true;
+        }
+        public bool UpdateMovie(Movie m)
+        {
+            return true;
+        }
+        public bool AddShow(Show s)
+        {
+            return true;
+        }
+        public bool UpdateShow(Show s)
+        {
+            return true;
+        }
+        public bool DeleteShow(int showID)
+        {
+            return true;
+        }
+        public bool AddAgent(User u)
+        {
+            return true;
+        }
+
+        public List<Theatre> GetAllTheatres()
+        {
+            return List<Theatre>;
+        }
+        public List<Movie> GetAllMovies()
+        {
+            return List<Movie>;
+        }
+        public List<Show> GetAllShows()
+        {
+            return List<Show>;
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -229,5 +292,19 @@ namespace MovieWiproPart2
             Console.WriteLine("Booking Status: {0}", booking1.BookingStatus);
 
         }
+    }
+}
+
+namespace Exceptions
+{
+    class InvalidScreenCountException
+    {
+        public InvalidScreenCountException(Exception e)
+        { }
+    }
+    class InvalidMovieTypeException
+    {
+        public InvalidMovieTypeException(Exception e)
+        { }
     }
 }
