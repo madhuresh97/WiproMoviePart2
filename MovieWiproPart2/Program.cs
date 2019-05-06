@@ -5,9 +5,9 @@ namespace MovieWiproPart2
 {
     class Movie
     {
-        int movieID;
+        public int movieID;
         string movieName, director, producer, cast, story, type;
-        double duration;
+        public double duration;
 
         public Movie(string movieName, string director, string producer, string cast, double duration, string story, string type)
         {
@@ -20,12 +20,10 @@ namespace MovieWiproPart2
             this.duration = duration;
             this.story = story;
             this.type = type;
-            if (type.Equals("Running") || type.Equals("Upcoming"))
+            if (type.Equals("Running") == false && type.Equals("Upcoming") == false)
             {
-                Console.WriteLine("");
-            }
-            else
                 Console.WriteLine("Enter type as Running or Upcoming.");
+            }                
         }
 
         public void DisplayMovieDetails()
@@ -43,7 +41,7 @@ namespace MovieWiproPart2
 
     class Theatre
     {
-        int theatreID;
+        public int theatreID;
         string theatreName;
         string city;
         string address;
@@ -77,26 +75,22 @@ namespace MovieWiproPart2
 
     class Screen
     {
-        int screenID;
+        public int screenID = 1000;
         public SortedList<int, string> seats = new SortedList<int, string>();
 
-        public Screen(int screenID)
+        public Screen()
         {
-            if (screenID > 1000)
-                this.screenID = screenID;
-            else
-                this.screenID = 1000;
-
+            screenID++;
             for (int i = 1; i <= 50; i++)
             {
-                this.seats.Add(i, "Vacant");
+                seats.Add(i, "Vacant");
             }
         }
     }
 
     class Show
     {
-        int ShowID;
+        public int ShowID;
         int MovieID;
         int TheatreID;
         int ScreenID;
@@ -124,14 +118,14 @@ namespace MovieWiproPart2
         {
 
             Console.WriteLine("ShowID: " + ShowID);
-            Console.WriteLine("MovieID" + MovieID);
-            Console.WriteLine("TheatreID" + TheatreID);
-            Console.WriteLine("ScreenID" + ScreenID);
-            Console.WriteLine("StartDate" + StartDate);
-            Console.WriteLine("EndDate" + EndDate);
-            Console.WriteLine("PlatinumSeatRate" + PlatinumSeatRate);
-            Console.WriteLine("GoldSeatRate" + GoldSeatRate);
-            Console.WriteLine("SilverSeatRate" + SilverSeatRate);
+            Console.WriteLine("MovieID: " + MovieID);
+            Console.WriteLine("TheatreID: " + TheatreID);
+            Console.WriteLine("ScreenID: " + ScreenID);
+            Console.WriteLine("StartDate: " + StartDate);
+            Console.WriteLine("EndDate: " + EndDate);
+            Console.WriteLine("PlatinumSeatRate: " + PlatinumSeatRate);
+            Console.WriteLine("GoldSeatRate: " + GoldSeatRate);
+            Console.WriteLine("SilverSeatRate: " + SilverSeatRate);
         }
     }
 
@@ -144,7 +138,7 @@ namespace MovieWiproPart2
             this.username = username;
             this.password = password;
             this.usertype = usertype;
-            if (usertype != "ADMIN" || usertype != "AGENT")
+            if (usertype.Equals("ADMIN") == false && usertype.Equals("AGENT") == false)
             {
                 Console.WriteLine("Invalid usertype. Should be ADMIN or AGENT.");
             }
@@ -159,21 +153,16 @@ namespace MovieWiproPart2
         string CustomerName;
         int NumberOfSeats;
         string SeatType;
-        decimal Amount;
+        public decimal Amount;
         string Email;
-        string BookingStatus;
-        List<int> SeatNumbers = new List<int>();
+        public string BookingStatus;
+        public List<int> SeatNumbers = new List<int>();
 
         public Booking(int ShowID, string CustomerName, int NumberOfSeats, string SeatType, string Email, Screen screen1, Show show1)
         {
             this.ShowID = ShowID;
             this.CustomerName = CustomerName;
             this.NumberOfSeats = NumberOfSeats;
-            if (NumberOfSeats < 1 || NumberOfSeats > 4)
-            {
-                Console.WriteLine("Enter Number of Seats between 1 to 4.");
-            }
-
             this.SeatType = SeatType;
             int VacantSeat = 0;
             foreach (string s in screen1.seats.Values)
@@ -182,7 +171,7 @@ namespace MovieWiproPart2
                     VacantSeat++;
             }
 
-            if (NumberOfSeats < VacantSeat)
+            if (NumberOfSeats < VacantSeat && NumberOfSeats > 1 && NumberOfSeats < 4)
             {
                 for (int i = 0; i < NumberOfSeats; i++)
                 {
@@ -195,6 +184,7 @@ namespace MovieWiproPart2
             else
             {
                 Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
+                Console.WriteLine("Enter Number of Seats between 1 to 4.");
                 BookingStatus = "Fail";
             }
 
@@ -215,11 +205,29 @@ namespace MovieWiproPart2
     {
         static void Main(string[] args)
         {
-            Movie movie1 = new Movie("Avengers", "Russo Brothers", "Marvel", "Chris, RDJ", 180, "Fiction", "Running");
+            Console.WriteLine("-------Movie Details--------");
+            Movie movie1 = new Movie("Kesari", "Anurag Singh", "Dharma Productions", "Akshay, Parineeti", 180, "Drama, History", "Running");
             movie1.DisplayMovieDetails();
 
-            Theatre t1 = new Theatre("INOX", "Vadodara", "Race Course Road", 2);
+            Console.WriteLine("-------Theatre Details--------");
+            Theatre t1 = new Theatre("PVR", "Mumbai", "Cuffe Parade", 7);
             t1.DisplayTheatreDetails();
+
+            Screen screen1 = new Screen();
+
+            DateTime startdate = new DateTime(2019, 4, 3, 12, 0, 0);
+            DateTime enddate = startdate.AddMinutes(movie1.duration);
+            Console.WriteLine("-------Show Details--------");
+            Show show1 = new Show(movie1.movieID, t1.theatreID, screen1.screenID, startdate, enddate, 350, 200, 180);
+            show1.DisplayShowDetails();
+
+            User user1 = new User("Madhuresh", "abc@123", "AGENT");
+
+            Booking booking1 = new Booking(show1.ShowID, "Madhuresh", 3, "Gold", "madhuresh@outlook.com", screen1, show1);
+            Console.WriteLine("-------Booking Details--------");
+            Console.WriteLine("Amount: {0}", booking1.Amount);
+            Console.WriteLine("Booking Status: {0}", booking1.BookingStatus);
+
         }
     }
 }
