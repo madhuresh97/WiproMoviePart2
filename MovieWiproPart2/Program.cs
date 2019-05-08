@@ -81,16 +81,16 @@ namespace MovieWiproPart2
     class Theatre
     {
         public int theatreID;
-        string theatreName;
-        string city;
-        string address;
-        int numberOfScreen;
+        public string theatreName;
+        public string city;
+        public string address;
+        public int numberOfScreen;
         List<int> screens = new List<int>();
 
         public Theatre(string theatreName, string city, string address, int numberOfScreen)
         {
             Random rnd = new Random();
-            this.theatreID = rnd.Next(1000, 2000);
+            theatreID = rnd.Next(1000, 2000);
             this.theatreName = theatreName;
             this.city = city;
             this.address = address;
@@ -183,7 +183,6 @@ namespace MovieWiproPart2
             }
         }
     }
-
     class Booking
     {
         public int BookingID =1000;
@@ -303,13 +302,87 @@ namespace MovieWiproPart2
 
     class Administrator : TicketBooking, IAdmin
     {
-        public bool AddTheatre(Theatre t)
+        MovieTicketing MT = new MovieTicketing();
+        public bool AddTheatre(Theatre obj)
         {
-            return true;
+            if (obj.theatreName == "" || obj.city == "" || obj.address == "")
+            {
+                Console.WriteLine("The theatre details should not be empty");
+            }
+            if (obj == null)
+            {
+                throw new NullReferenceException("The theatre details should not be null");
+            }
+            if (obj.numberOfScreen <= 0)
+            {
+                throw new Exceptions.InvalidScreenCountException("Invalid Screen Count. The number of seats should not be less than or equal to zero");
+            }
+            else
+            {
+                MovieTicketing.Theatres.Add(obj);
+                return true;
+            }
         }
-        public bool UpdateTheatre(Theatre t)
+        public bool UpdateTheatre(Theatre obj)
         {
-            return true;
+            for (int i = 0; i < MovieTicketing.Theatres.Count; i++)
+            {
+                var v = MovieTicketing.Theatres[i];
+
+                if ((v.theatreName.Equals(obj.theatreName, StringComparison.InvariantCultureIgnoreCase)) && (v.city.Equals(obj.city, StringComparison.InvariantCultureIgnoreCase)) && (v.address.Equals(obj.address, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    Console.WriteLine("Theatre details are available in the database:");
+                    Console.WriteLine("Theatre name is {0}", v.theatreName);
+                    Console.WriteLine("City name is {0}", v.city);
+                    Console.WriteLine("Address is {0}", v.address);
+                    Console.WriteLine("Number of screens are {0}", v.numberOfScreen);
+                    Console.WriteLine("Enter the updated theatre details");
+
+                    Console.WriteLine("Enter new/old Theatre name");
+                    string TheatreName = Console.ReadLine();
+                    Console.WriteLine("Enter new/old Address");
+                    string address = Console.ReadLine();
+                    Console.WriteLine("Enter new/old City name");
+                    string Cityname = Console.ReadLine();
+                    if (Cityname == "" || address == "" || TheatreName == "")
+                    {
+                        Console.WriteLine("Theatre details should not be empty");
+                        return false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Enter Number of seats");
+                        int NOS = Convert.ToInt32(Console.ReadLine());
+                        if (NOS <= 0)
+                        {
+                            throw new Exceptions.InvalidScreenCountException("Invalid Screen Count. The number of seats should not be less than or equal to zero");
+                        }
+
+                        else
+                        {
+                            int Index = 0;
+                            Theatre theatre = new Theatre(TheatreName, Cityname, address, NOS);
+                            for (int I = 0; i < MovieTicketing.Theatres.Count; i++)
+                            {
+                                var V = MovieTicketing.Theatres[I];
+                                if (V.theatreName == obj.theatreName && V.address == obj.address)
+                                {
+                                    Index = i;
+                                }
+                            }
+                            MovieTicketing.Theatres.RemoveAt(Index);
+                            MovieTicketing.Theatres.Insert(Index, theatre);
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No matching theatres in the database");
+                }
+            }
+
+            return false;
         }
         public bool AddMovie(Movie m)
         {
