@@ -3,6 +3,23 @@ using System.Collections.Generic;
 
 namespace MovieWiproPart2
 {
+    namespace Exceptions
+    {
+        class InvalidScreenCountException : Exception
+        {
+            public InvalidScreenCountException(string msg) : base(msg)
+            { }
+        }
+        class InvalidMovieTypeException : Exception
+        {
+            public InvalidMovieTypeException(string msg) : base (msg)
+            { }
+        }
+    }
+    public class RandomGenerator
+    {
+        public static Random R = new Random();
+    }
     interface IAdmin
     {
         bool AddTheatre(Theatre obj);
@@ -17,10 +34,18 @@ namespace MovieWiproPart2
         List<Movie> GetAllMovies();
         List<Show> GetAllShows();
     }
+    class MovieTicketing
+    {
+        public static List<User> UserInformation = new List<User>();
+        public static List<Theatre> Theatres = new List<Theatre>();
+        public static List<Movie> Movies = new List<Movie>();
+        public static List<Show> shows = new List<Show>();
+        public static List<Booking> Bookings = new List<Booking>();
+    }
     class Movie
     {
         public int movieID;
-        string movieName, director, producer, cast, story, type;
+        public string movieName, director, producer, cast, story, type;
         public double duration;
 
         public Movie(string movieName, string director, string producer, string cast, double duration, string story, string type)
@@ -161,14 +186,14 @@ namespace MovieWiproPart2
 
     class Booking
     {
-        int BookingID=1000;
+        public int BookingID =1000;
         DateTime BookingDate = DateTime.Now;
-        int ShowID;
-        string CustomerName;
-        int NumberOfSeats;
-        string SeatType;
+        public int ShowID;
+        public string CustomerName;
+        public int NumberOfSeats;
+        public string SeatType;
         public decimal Amount;
-        string Email;
+        public string Email;
         public string BookingStatus;
         public List<int> SeatNumbers = new List<int>();
 
@@ -214,8 +239,69 @@ namespace MovieWiproPart2
             this.Email = Email;
         }
     }
+    abstract class TicketBooking
+    {
+        public int BookTicket(Booking obj)
+        {
+            if (obj.ShowID == 0 || obj.CustomerName == "" || obj.NumberOfSeats <= 0 || obj.SeatType == "" || obj.Email == "")
+            {
+                Console.WriteLine("Booking Details can't be empty");
+                return -1;
+            }
+            else
+            {
+                MovieTicketing.Bookings.Add(obj);
+                return obj.BookingID;
+            }
+        }
+        public void PrintTicket(int BookingId)
+        {
+            int TheatID = 0;
+            int ScrID = 0;
+            string MovName = "";
+            if (BookingId > 0)
+            {
+                for (int x = 0; x < MovieTicketing.Bookings.Count; x++)
+                {
+                    var v = MovieTicketing.Bookings[x];
+                    for (int y = 0; y < MovieTicketing.shows.Count; y++)
+                    {
+                        var h = MovieTicketing.shows[y];
+                        if (h.ShowID == v.ShowID)
+                        {
+                            TheatID = h.TheatreID;
+                            ScrID = h.ScreenID;
+                            for (int z = 0; z < MovieTicketing.Movies.Count; z++)
+                            {
+                                var a = MovieTicketing.Movies[z];
+                                if (a.movieID == h.movieID)                               
+                                    MovName = a.movieName;
+                            }
+                        }
+                    }
+                    string s = " ";
+                    for (int n = 0; n < Booking.SeatNumbers.Count; n++)
+                        s = s + " " + Booking.SeatNumbers[n];
 
-    class Administrator : IAdmin
+                    if (v.BookingID == BookingId)
+                    {
+                        Console.WriteLine("\nBooking ID:        Booking Date:           Customer Name:");
+                        Console.WriteLine("{0}              {1}    {2}", BookingId, v.BookingDate, v.CustomerName);
+                        Console.WriteLine("\nSeats:               Seat type:          Seat Numbers:");
+                        Console.WriteLine("{0}                     {1}           {2}", v.NumberOfSeats, v.SeatType, s);
+                        Console.WriteLine("\nMovie Name:          Show ID:            Theatre ID/Screen ID:");
+                        Console.WriteLine("{0}                  {1}                 {2}/{3}", MovName, v.ShowID, TheatID, ScrID);
+                        Console.WriteLine("\nAmount Paid:                             Booking Status");
+                        Console.WriteLine("{0}                                      {1}\n", v.Amount, v.BookingStatus);
+                    }
+                }
+            }
+            else
+                Console.WriteLine("Booking ID should be a non negative value");
+        }
+    }
+
+    class Administrator : TicketBooking, IAdmin
     {
         public bool AddTheatre(Theatre t)
         {
@@ -292,19 +378,5 @@ namespace MovieWiproPart2
             Console.WriteLine("Booking Status: {0}", booking1.BookingStatus);
 
         }
-    }
-}
-
-namespace Exceptions
-{
-    class InvalidScreenCountException
-    {
-        public InvalidScreenCountException(Exception e)
-        { }
-    }
-    class InvalidMovieTypeException
-    {
-        public InvalidMovieTypeException(Exception e)
-        { }
     }
 }
