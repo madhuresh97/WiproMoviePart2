@@ -98,7 +98,7 @@ namespace MovieWiproPart2
 
             for (int i = 1; i <= numberOfScreen; i++)
             {
-                this.screens.Add(i);
+                screens.Add(i);
             }
         }
 
@@ -114,15 +114,14 @@ namespace MovieWiproPart2
 
     class Screen
     {
-        public int screenID = 1000;
-        public SortedList<int, string> seats = new SortedList<int, string>();
-
+        public static int ScreenID;
+        public SortedList<int, string> Seats = new SortedList<int, string>();
         public Screen()
         {
-            screenID++;
-            for (int i = 1; i <= 50; i++)
+            ScreenID = RandomGenerator.R.Next(1000, 10000);
+            for (int i = 0; i < 50; i++)
             {
-                seats.Add(i, "Vacant");
+                Seats.Add(i, "Vacant");
             }
         }
     }
@@ -130,11 +129,11 @@ namespace MovieWiproPart2
     class Show
     {
         public int ShowID;
-        int MovieID;
-        int TheatreID;
-        int ScreenID;
-        DateTime StartDate;
-        DateTime EndDate;
+        public int MovieID;
+        public int TheatreID;
+        public int ScreenID;
+        public DateTime StartDate;
+        public DateTime EndDate;
         public decimal PlatinumSeatRate;
         public decimal GoldSeatRate;
         public decimal SilverSeatRate;
@@ -170,7 +169,7 @@ namespace MovieWiproPart2
 
     class User
     {
-        string username, password, usertype;
+        public string username, password, usertype;
 
         public User(string username, string password, string usertype)
         {
@@ -183,61 +182,141 @@ namespace MovieWiproPart2
             }
         }
     }
-    class Booking
+
+    #region BookingClass
+    public class Booking
     {
-        public int BookingID =1000;
-        DateTime BookingDate = DateTime.Now;
+        public int BookingID;
+        public DateTime BookingDate = DateTime.Today;
         public int ShowID;
-        public string CustomerName;
-        public int NumberOfSeats;
-        public string SeatType;
-        public decimal Amount;
-        public string Email;
-        public string BookingStatus;
-        public List<int> SeatNumbers = new List<int>();
 
-        public Booking(int ShowID, string CustomerName, int NumberOfSeats, string SeatType, string Email, Screen screen1, Show show1)
+        #region CustomerName
+        private string _CustomerName;
+        public string CustomerName
         {
-            this.ShowID = ShowID;
-            this.CustomerName = CustomerName;
-            this.NumberOfSeats = NumberOfSeats;
-            this.SeatType = SeatType;
-            int VacantSeat = 0;
-            foreach (string s in screen1.seats.Values)
+            get
             {
-                if (s == "Vacant")
-                    VacantSeat++;
+                return _CustomerName;
             }
-
-            if (NumberOfSeats < VacantSeat && NumberOfSeats > 1 && NumberOfSeats < 4)
+            set
             {
-                for (int i = 0; i < NumberOfSeats; i++)
+                if (value == "" || value == null)
                 {
-                    int key = screen1.seats.IndexOfValue("Vacant");
-                    screen1.seats[key] = "Reserved";
-                    SeatNumbers.Add(key);
+                    Console.WriteLine("Customer name is empty. Try again\n");
+                    _CustomerName = "No_name";
                 }
-                BookingStatus = "Success";
+                else
+                {
+                    _CustomerName = value;
+                }
             }
-            else
+        }
+        #endregion
+
+        #region NumberOfSeats
+        private int _NumberOfSeats;
+        public int NumberOfSeats
+        {
+            get
             {
-                Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
-                Console.WriteLine("Enter Number of Seats between 1 to 4.");
-                BookingStatus = "Fail";
+                return _NumberOfSeats;
             }
+            set
+            {
+                if (value >= 1 || value <= 4)
+                {
+                    _NumberOfSeats = value;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid number of seats. Cannot be more than 4\nAssigning default value of 1");
+                }
+            }
+        }
+        #endregion
 
-            if (SeatType.ToLower() == "platinum")
-                Amount = NumberOfSeats * show1.PlatinumSeatRate;
-            else if (SeatType.ToLower() == "gold")
-                Amount = NumberOfSeats * show1.GoldSeatRate;
-            else if (SeatType.ToLower() == "silver")
-                Amount = NumberOfSeats * show1.SilverSeatRate;
-            else
-                Console.WriteLine("Enter Seat Type as- Platinum, Gold or Silver.");
+        #region SeatType
+        private string _SeatType;
+        public string SeatType
+        {
+            get
+            {
+                return _SeatType;
+            }
+            set
+            {
+                if (value.Equals("platinum", StringComparison.InvariantCultureIgnoreCase) || value.Equals("gold", StringComparison.InvariantCultureIgnoreCase) || value.Equals("silver", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    _SeatType = value;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid Seat type");
+                }
+            }
+        }
+        #endregion
 
-            this.Email = Email;
+        #region Amount
+        public decimal Amount;
+
+        #endregion
+
+        #region Email
+        private string _Email;
+        public string Email
+        {
+            get
+            {
+                return _Email;
+            }
+            set
+            {
+                if (value == "" || value == null)
+                {
+                    Console.WriteLine("Email address is empty. Try again\n");
+                }
+                else
+                {
+                    _Email = value;
+                }
+            }
+        }
+        #endregion
+
+        public string BookingStatus;
+
+        public static List<int> SeatNumbers = new List<int>();
+        public Booking(int SI, string CN, int NOS, string ST, string MAIL)
+        {
+            BookingID = RandomGenerator.R.Next(1000, 10000);
+            ShowID = SI;
+            CustomerName = CN;
+            NumberOfSeats = NOS;
+            SeatType = ST;
+            Email = MAIL;
+            for (int i = 0; i < MovieTicketing.shows.Count; i++)
+            {
+                var v = MovieTicketing.shows[i];
+                if (v.ShowID == ShowID)
+                {
+                    if (SeatType.Equals("platinum", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        Amount = NumberOfSeats * v.PlatinumSeatRate;
+                    }
+                    if (SeatType.Equals("gold", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        Amount = NumberOfSeats * v.GoldSeatRate;
+                    }
+                    if (SeatType.Equals("silver", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        Amount = NumberOfSeats * v.SilverSeatRate;
+                    }
+                }
+            }
         }
     }
+    #endregion
     abstract class TicketBooking
     {
         public int BookTicket(Booking obj)
@@ -273,7 +352,7 @@ namespace MovieWiproPart2
                             for (int z = 0; z < MovieTicketing.Movies.Count; z++)
                             {
                                 var a = MovieTicketing.Movies[z];
-                                if (a.movieID == h.movieID)                               
+                                if (a.movieID == h.MovieID)                               
                                     MovName = a.movieName;
                             }
                         }
@@ -384,42 +463,228 @@ namespace MovieWiproPart2
 
             return false;
         }
-        public bool AddMovie(Movie m)
+        public bool AddMovie(Movie obj)
         {
-            return true;
+            if (obj.movieName == "" || obj.producer == "" || obj.story == "" || obj.director == "" || obj.cast == "")
+            {
+                Console.WriteLine("The Movie details should not be empty");
+                return false;
+            }
+            if (obj == null)
+            {
+                throw new NullReferenceException("The Movie details should not be null");
+            }
+
+            if (obj.duration <= 0)
+            {
+                Console.WriteLine("The Movie details should not be empty");
+                return false;
+            }
+            if ((obj.type.Equals("running", StringComparison.InvariantCultureIgnoreCase)) || (obj.type.Equals("upcoming", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                MovieTicketing.Movies.Add(obj);
+                return true;
+            }
+            else
+            {
+                throw new Exceptions.InvalidMovieTypeException("Invalid Movie type. The movie type should be either 'Running' or 'Upcoming'");
+
+            }
         }
-        public bool UpdateMovie(Movie m)
+        public bool UpdateMovie(Movie obj)
         {
-            return true;
+            for (int i = 0; i < MovieTicketing.Movies.Count; i++)
+            {
+                var v = MovieTicketing.Movies[i];
+
+                if ((v.movieName == obj.movieName) && (v.producer == obj.producer) && (v.story == obj.story) && (v.director == obj.director) && (v.cast == obj.cast))
+                {
+                    Console.WriteLine("\nMovie details are available in the database:");
+                    Console.WriteLine("Movie name is {0}", v.movieName);
+                    Console.WriteLine("Producer is {0}", v.producer);
+                    Console.WriteLine("Directed by {0}", v.director);
+                    Console.WriteLine("Cast of the movie includes {0}", v.cast);
+                    Console.WriteLine("Story of the movie is {0}", v.story);
+                    Console.WriteLine("Movie is {0}", v.type);
+                    Console.WriteLine("Duration of the Movie is {0}", v.duration);
+                    Console.WriteLine("\nEnter the updated Movie details");
+
+                    Console.WriteLine("Enter the old/updated Movie Name");
+                    string movieName = Console.ReadLine();
+                    Console.WriteLine("Enter the old/updated Producer Name");
+                    string producer = Console.ReadLine();
+                    Console.WriteLine("Enter the old/updated Director Name");
+                    string director = Console.ReadLine();
+                    Console.WriteLine("Enter the old/updated Story details");
+                    string story = Console.ReadLine();
+                    Console.WriteLine("Enter the old/updated Cast members");
+                    string cast = Console.ReadLine();
+                    Console.WriteLine("Enter the old/update Duration");
+                    int duration = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Enter the old/update Movie Type i.e 'Running' or 'Upcoming'");
+                    string type = Console.ReadLine();
+                    if (movieName == "" || producer == "" || director == "" || story == "" || cast == "" || type == "")
+                    {
+                        Console.WriteLine("Movie details should not be empty");
+                        return false;
+                    }
+                    else
+                    {
+                        if (duration <= 0)
+                        {
+                            throw new Exceptions.InvalidScreenCountException("Invalid Screen Count. The number of seats should not be less than or equal to zero");
+                        }
+
+                        else
+                        {
+                            int Index = 0;
+                            Movie movie = new Movie(movieName, director, producer, cast, duration, story, type);
+                            for (int I = 0; I < MovieTicketing.Movies.Count; I++)
+                            {
+                                var V = MovieTicketing.Movies[I];
+                                if (V.movieName == obj.movieName && V.producer == obj.producer && v.director == obj.director)
+                                {
+                                    Index = I;
+                                }
+                            }
+                            MovieTicketing.Movies.RemoveAt(Index);
+                            MovieTicketing.Movies.Insert(Index, movie);
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No matching movies in the database. Update not possible");
+                }
+            }
+            return false;
         }
-        public bool AddShow(Show s)
+        public bool AddShow(Show obj)
         {
-            return true;
+            Console.WriteLine();
+            if (obj.EndDate == null || obj.MovieID == 0 || obj.ScreenID == 0 || obj.StartDate == null || obj.TheatreID == 0 || obj.GoldSeatRate == 0 || obj.PlatinumSeatRate == 0 || obj.SilverSeatRate == 0)
+            {
+                Console.WriteLine("The Show details should not be empty");
+                return false;
+            }
+            if (obj == null)
+            {
+                throw new NullReferenceException("The Show details should not be null");
+            }
+
+            if (Screen.ScreenID == obj.ScreenID)
+            {
+                MovieTicketing.shows.Add(obj);
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Inappropriate data found");
+                return false;
+            }
         }
-        public bool UpdateShow(Show s)
+        public bool UpdateShow(Show obj)
         {
-            return true;
+            for (int i = 0; i < MovieTicketing.shows.Count; i++)
+            {
+                var v = MovieTicketing.shows[i];
+
+                if ((v.StartDate == obj.StartDate) && (v.EndDate == obj.EndDate) && (v.GoldSeatRate == obj.GoldSeatRate) && (v.PlatinumSeatRate == obj.PlatinumSeatRate) && (v.SilverSeatRate == obj.SilverSeatRate))
+                {
+                    Console.WriteLine("Movie details are available in the database:");
+                    Console.WriteLine("Show start date is {0}", v.StartDate);
+                    Console.WriteLine("Shows' end date is {0}", v.EndDate);
+                    Console.WriteLine("Price of Gold tier seats is {0}", v.GoldSeatRate);
+                    Console.WriteLine("price of Platinum tier seats is by {0}", v.PlatinumSeatRate);
+                    Console.WriteLine("Price of Silver tier seats is {0}", v.SilverSeatRate);
+
+                    Console.WriteLine("\nEnter the updated Show details");
+                    //specify what is being entered
+
+                    Console.WriteLine("Enter old/updated First show date");
+                    DateTime Start = Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Enter old/updated Last show date");
+                    DateTime End = Convert.ToDateTime(Console.ReadLine());
+                    Console.WriteLine("Enter old/updated Platinum seat rate");
+                    decimal Platinum = Convert.ToDecimal(Console.ReadLine());
+                    Console.WriteLine("Enter old/updated Gold Seat rate");
+                    decimal Gold = Convert.ToDecimal(Console.ReadLine());
+                    Console.WriteLine("Enter old/updated Silver Seat rate");
+                    decimal Silver = Convert.ToDecimal(Console.ReadLine());
+
+                    if (Start == null || End == null || Platinum <= 0 || Gold <= 0 || Silver <= 0)
+                    {
+                        Console.WriteLine("Show details should not be empty");
+                        return false;
+                    }
+                    else
+                    {
+                        int Index = 0;
+                        Show SHOW = new Show(obj.MovieID, obj.TheatreID, obj.ScreenID, Start, End, Platinum, Gold, Silver);
+                        for (int I = 0; I < MovieTicketing.shows.Count; I++)
+                        {
+                            var V = MovieTicketing.shows[I];
+                            if (V.EndDate == obj.EndDate && V.StartDate == obj.StartDate && V.PlatinumSeatRate == obj.PlatinumSeatRate && V.GoldSeatRate == obj.GoldSeatRate)
+                            {
+                                Index = I;
+                            }
+                        }
+                        MovieTicketing.shows.RemoveAt(Index);
+                        MovieTicketing.shows.Insert(Index, SHOW);
+                        return true;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No matching Shows in the database. Update not possible");
+                }
+            }
+            return false;
         }
         public bool DeleteShow(int showID)
         {
-            return true;
+            int index = 0;
+            foreach (var v in MovieTicketing.shows)
+            {
+                if (v.ShowID == showID)
+                {
+                    MovieTicketing.shows.RemoveAt(index);
+                    return true;
+                }
+                index++;
+            }
+            return false;
         }
-        public bool AddAgent(User u)
+        public bool AddAgent(User obj)
         {
-            return true;
+            if (obj.username == "" || obj.password == "" || obj.usertype == "")
+            {
+                Console.WriteLine("The User information should not be empty");
+                return false;
+            }
+            if (obj == null)
+            {
+                throw new NullReferenceException("The User details should not be null");
+            }
+            else
+            {
+                MovieTicketing.UserInformation.Add(obj);
+                return true;
+            }
         }
 
         public List<Theatre> GetAllTheatres()
         {
-            return List<Theatre>;
+            return MovieTicketing.Theatres;
         }
         public List<Movie> GetAllMovies()
         {
-            return List<Movie>;
+            return MovieTicketing.Movies;
         }
         public List<Show> GetAllShows()
         {
-            return List<Show>;
+            return MovieTicketing.shows;
         }
     }
 
@@ -440,12 +705,12 @@ namespace MovieWiproPart2
             DateTime startdate = new DateTime(2019, 4, 3, 12, 0, 0);
             DateTime enddate = startdate.AddMinutes(movie1.duration);
             Console.WriteLine("-------Show Details--------");
-            Show show1 = new Show(movie1.movieID, t1.theatreID, screen1.screenID, startdate, enddate, 350, 200, 180);
+            Show show1 = new Show(movie1.movieID, t1.theatreID, 1000, startdate, enddate, 350, 200, 180);
             show1.DisplayShowDetails();
 
             User user1 = new User("Madhuresh", "abc@123", "AGENT");
 
-            Booking booking1 = new Booking(show1.ShowID, "Madhuresh", 3, "Gold", "madhuresh@outlook.com", screen1, show1);
+            Booking booking1 = new Booking(show1.ShowID, "Madhuresh", 3, "Gold", "madhuresh@outlook.com");
             Console.WriteLine("-------Booking Details--------");
             Console.WriteLine("Amount: {0}", booking1.Amount);
             Console.WriteLine("Booking Status: {0}", booking1.BookingStatus);
